@@ -1,14 +1,32 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:developer';
+
 import 'package:firebase_login/medico_home.dart';
+import 'package:firebase_login/resources/authentication.dart';
 import 'package:firebase_login/user_account/medico_login.dart';
 import 'package:firebase_login/user_account/widgets/account_status.dart';
 import 'package:firebase_login/user_account/widgets/sub_title.dart';
 import 'package:firebase_login/user_account/widgets/welcome_text.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
-class MedicoSignUpScreen extends StatelessWidget {
+class MedicoSignUpScreen extends StatefulWidget {
   const MedicoSignUpScreen({super.key});
+
+  @override
+  State<MedicoSignUpScreen> createState() => _MedicoSignUpScreenState();
+}
+
+class _MedicoSignUpScreenState extends State<MedicoSignUpScreen> {
+  bool _isVisible = true;
+
+  // controllers
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  // auth
+  AuthenticationMethods authenticationMethods = AuthenticationMethods();
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +64,9 @@ class MedicoSignUpScreen extends StatelessWidget {
                     color: Colors.grey.shade400,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const TextField(
-                    decoration: InputDecoration(
+                  child: TextField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
                       prefixIcon: Icon(
                         Icons.person,
                         color: Colors.black,
@@ -69,9 +88,10 @@ class MedicoSignUpScreen extends StatelessWidget {
                     color: Colors.grey.shade400,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const TextField(
+                  child: TextField(
+                    controller: emailController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       prefixIcon: Icon(
                         Icons.mail,
                         color: Colors.black,
@@ -94,18 +114,28 @@ class MedicoSignUpScreen extends StatelessWidget {
                     color: Colors.grey.shade400,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const TextField(
-                    obscureText: true,
+                  child: TextField(
+                    obscureText: _isVisible,
+                    controller: passwordController,
                     keyboardType: TextInputType.visiblePassword,
                     decoration: InputDecoration(
-                      prefixIcon: Icon(
+                      prefixIcon: const Icon(
                         Icons.person,
                         color: Colors.black,
                       ),
                       border: InputBorder.none,
                       hintText: "Password",
-                      hintStyle: TextStyle(color: Colors.black),
-                      suffixIcon: Icon(Icons.visibility_off),
+                      hintStyle: const TextStyle(color: Colors.black),
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isVisible = !_isVisible;
+                          });
+                        },
+                        child: !_isVisible
+                            ? const Icon(Icons.visibility)
+                            : const Icon(Icons.visibility_off),
+                      ),
                     ),
                   ),
                 ),
@@ -113,13 +143,39 @@ class MedicoSignUpScreen extends StatelessWidget {
 
                 // button
                 GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MedicoHomeScreen(),
-                      ),
+                  onTap: () async {
+                    String output = await authenticationMethods.signUpUser(
+                      name: nameController.text,
+                      email: emailController.text,
+                      password: passwordController.text,
                     );
+
+                    if (output == "success") {
+                      log("auth functions");
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MedicoHomeScreen(),
+                        ),
+                      );
+                    } else {
+                      final snackBar = SnackBar(
+                        //behavior: SnackBarBehavior.floating,
+                        backgroundColor: const Color.fromRGBO(0, 0, 0, 1),
+                        content: Center(
+                          child: Text(
+                            output,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      );
+
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }
                   },
                   child: Container(
                     height: 60,
@@ -179,9 +235,13 @@ class MedicoSignUpScreen extends StatelessWidget {
                       child: Container(
                         height: 80,
                         width: 80,
+                        padding: const EdgeInsets.all(20),
                         decoration: const BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
+                        ),
+                        child: Image.asset(
+                          "assets/icons/social_icons/google.png",
                         ),
                       ),
                     ),
@@ -194,9 +254,13 @@ class MedicoSignUpScreen extends StatelessWidget {
                       child: Container(
                         height: 80,
                         width: 80,
+                        padding: const EdgeInsets.all(20),
                         decoration: const BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
+                        ),
+                        child: Image.asset(
+                          "assets/icons/social_icons/apple.png",
                         ),
                       ),
                     ),
@@ -209,9 +273,13 @@ class MedicoSignUpScreen extends StatelessWidget {
                       child: Container(
                         height: 80,
                         width: 80,
+                        padding: const EdgeInsets.all(20),
                         decoration: const BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
+                        ),
+                        child: Image.asset(
+                          "assets/icons/social_icons/facebook.png",
                         ),
                       ),
                     )

@@ -1,7 +1,6 @@
 import 'package:firebase_login/medico_home.dart';
 import 'package:firebase_login/user_account/medico_signup.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:lottie/lottie.dart';
 
 import 'widgets/account_status.dart';
@@ -9,8 +8,15 @@ import 'widgets/forgot_password.dart';
 import 'widgets/sub_title.dart';
 import 'widgets/welcome_text.dart';
 
-class MedicoLoginScreen extends StatelessWidget {
+class MedicoLoginScreen extends StatefulWidget {
   const MedicoLoginScreen({super.key});
+
+  @override
+  State<MedicoLoginScreen> createState() => _MedicoLoginScreenState();
+}
+
+class _MedicoLoginScreenState extends State<MedicoLoginScreen> {
+  bool _isVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -82,18 +88,27 @@ class MedicoLoginScreen extends StatelessWidget {
                     color: Colors.grey.shade400,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const TextField(
-                    obscureText: true,
+                  child: TextField(
+                    obscureText: _isVisible,
                     keyboardType: TextInputType.visiblePassword,
                     decoration: InputDecoration(
-                      prefixIcon: Icon(
+                      prefixIcon: const Icon(
                         Icons.person,
                         color: Colors.black,
                       ),
                       border: InputBorder.none,
                       hintText: "Password",
-                      hintStyle: TextStyle(color: Colors.black),
-                      suffixIcon: Icon(Icons.visibility_off),
+                      hintStyle: const TextStyle(color: Colors.black),
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isVisible = !_isVisible;
+                          });
+                        },
+                        child: !_isVisible
+                            ? const Icon(Icons.visibility)
+                            : const Icon(Icons.visibility_off),
+                      ),
                     ),
                   ),
                 ),
