@@ -1,4 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:developer';
+
 import 'package:firebase_login/medico_home.dart';
+import 'package:firebase_login/resources/authentication.dart';
 import 'package:firebase_login/user_account/medico_signup.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -17,6 +22,19 @@ class MedicoLoginScreen extends StatefulWidget {
 
 class _MedicoLoginScreenState extends State<MedicoLoginScreen> {
   bool _isVisible = true;
+
+  AuthenticationMethods authenticationMethods = AuthenticationMethods();
+
+  // controllers
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.text;
+    passwordController.text;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +83,9 @@ class _MedicoLoginScreenState extends State<MedicoLoginScreen> {
                     color: Colors.grey.shade400,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const TextField(
-                    decoration: InputDecoration(
+                  child: TextField(
+                    controller: emailController,
+                    decoration: const InputDecoration(
                       prefixIcon: Icon(
                         Icons.person,
                         color: Colors.black,
@@ -89,6 +108,7 @@ class _MedicoLoginScreenState extends State<MedicoLoginScreen> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: TextField(
+                    controller: passwordController,
                     obscureText: _isVisible,
                     keyboardType: TextInputType.visiblePassword,
                     decoration: InputDecoration(
@@ -120,13 +140,35 @@ class _MedicoLoginScreenState extends State<MedicoLoginScreen> {
 
                 // login button
                 GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MedicoHomeScreen(),
-                      ),
+                  onTap: () async {
+                    String output = await authenticationMethods.loginUser(
+                      email: emailController.text,
+                      password: passwordController.text,
                     );
+
+                    if (output == "success") {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (ctx) => const MedicoHomeScreen(),
+                        ),
+                      );
+                    } else {
+                      log(output);
+
+                      final snackBar = SnackBar(
+                        content: Center(
+                            child: Text(
+                          output,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        )),
+                      );
+
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }
                   },
                   child: Container(
                     height: 60,

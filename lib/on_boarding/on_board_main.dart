@@ -83,7 +83,7 @@ class _MedicoOnboardHomeState extends State<MedicoOnboardHome> {
                   lastPage
                       ? GestureDetector(
                           onTap: () {
-                            Navigator.push(
+                            Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                 builder: (ctx) => const MedicoLoginScreen(),

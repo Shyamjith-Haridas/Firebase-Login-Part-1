@@ -2,7 +2,6 @@
 
 import 'dart:developer';
 
-import 'package:firebase_login/medico_home.dart';
 import 'package:firebase_login/resources/authentication.dart';
 import 'package:firebase_login/user_account/medico_login.dart';
 import 'package:firebase_login/user_account/widgets/account_status.dart';
@@ -27,6 +26,14 @@ class _MedicoSignUpScreenState extends State<MedicoSignUpScreen> {
 
   // auth
   AuthenticationMethods authenticationMethods = AuthenticationMethods();
+
+  @override
+  void dispose() {
+    nameController.text;
+    emailController.text;
+    passwordController.text;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,18 +158,14 @@ class _MedicoSignUpScreenState extends State<MedicoSignUpScreen> {
                     );
 
                     if (output == "success") {
-                      log("auth functions");
-
-                      Navigator.push(
-                        context,
+                      Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
-                          builder: (context) => const MedicoHomeScreen(),
+                          builder: (ctx) => const MedicoLoginScreen(),
                         ),
                       );
                     } else {
+                      log(output);
                       final snackBar = SnackBar(
-                        //behavior: SnackBarBehavior.floating,
-                        backgroundColor: const Color.fromRGBO(0, 0, 0, 1),
                         content: Center(
                           child: Text(
                             output,
@@ -226,22 +229,27 @@ class _MedicoSignUpScreenState extends State<MedicoSignUpScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Card(
-                      color: Colors.white,
-                      clipBehavior: Clip.hardEdge,
-                      elevation: 2,
-                      shadowColor: Colors.black,
-                      shape: const CircleBorder(),
-                      child: Container(
-                        height: 80,
-                        width: 80,
-                        padding: const EdgeInsets.all(20),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Image.asset(
-                          "assets/icons/social_icons/google.png",
+                    GestureDetector(
+                      onTap: () {
+                        authenticationMethods.signInWithGoogle(context);
+                      },
+                      child: Card(
+                        color: Colors.white,
+                        clipBehavior: Clip.hardEdge,
+                        elevation: 2,
+                        shadowColor: Colors.black,
+                        shape: const CircleBorder(),
+                        child: Container(
+                          height: 80,
+                          width: 80,
+                          padding: const EdgeInsets.all(20),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Image.asset(
+                            "assets/icons/social_icons/google.png",
+                          ),
                         ),
                       ),
                     ),
